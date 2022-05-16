@@ -1,0 +1,19 @@
+#
+# Deployment file for the UESP ESO WordPress plugin
+#
+
+name = uesp.esowpplugin
+staged = false
+
+ignore = .hg*
+ignore = .git*
+ignore = *.deploy
+ignore = *.sh
+ignore = *.sql
+ignore = cron*
+ignore = log/*.log
+
+dest = content2.uesp.net:/home/uesp/blog/wp-content/plugins/uesp-eso-wp-plugin/
+
+# chown_dest = apache {dest}
+# chmod_dest = g+rw -R {dest}
