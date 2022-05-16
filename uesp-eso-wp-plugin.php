@@ -1,6 +1,6 @@
 <?php
 /*
-	Plugin Name: UESP ESO Data Plugin
+	Plugin Name: UESP ESO Data
 	Plugin URI: https://uesp.net
 	Description: Loads and displays ESO skill and item tooltips from UESP.net. 
 	Version: 0.1
