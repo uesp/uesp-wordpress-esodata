@@ -1,4 +1,6 @@
 
+window.EsoShouldShowToolip = false;
+
 
 window.EsoShowPopupSkillTooltip = function(skillHtml, parent)
 {
@@ -71,9 +73,9 @@ window.AdjustEsoSkillPopupTooltipPosition = function (tooltip, parent)
 		var deltaHeight = viewportTooltip.bottom - windowHeight + 10;
 		top = top - deltaHeight
 	}
-	else if (viewportTooltip.top < 0)
+	else if (viewportTooltip.top < 100)
 	{
-		var deltaHeight = viewportTooltip.top - 10;
+		var deltaHeight = viewportTooltip.top - 100;
 		top = top - deltaHeight
 	}
 	
@@ -99,6 +101,8 @@ window.AdjustEsoSkillPopupTooltipPosition = function (tooltip, parent)
 
 function OnEsoDataSkillClientHover(e)
 {
+	EsoShouldShowToolip = true;
+	
 	var element = jQuery(this).find(".uespEsoSkillIcon");
 	var skillid = element.attr("skillid");
 	var skillName = element.attr("skillname");
@@ -126,6 +130,7 @@ function OnEsoDataSkillClientHover(e)
 
 function OnReceiveEsoDataSkillClientData(skillData)
 {
+	if (!EsoShouldShowToolip) return;
 	EsoShowPopupSkillTooltip(skillData, jQuery(this));
 }
 
@@ -134,6 +139,7 @@ function OnEsoDataSkillClientLeave(e)
 {
 	var popupElement = jQuery("#esovsPopupSkillTooltip");
 	popupElement.hide();
+	EsoShouldShowToolip = false;
 }
 
 

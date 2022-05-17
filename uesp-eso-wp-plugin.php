@@ -7,6 +7,8 @@
 	Author: Daveh
 	Author URI: https://uesp.net/wiki/User:Daveh
 	License: MIT
+	
+	Made to be compatible/similar to the ESO-HUB plugin so minimum effort is needed to switch between the two.
 */
 
 class CUespEsoWordPressPlugin
@@ -15,6 +17,35 @@ class CUespEsoWordPressPlugin
 	public static $ICON_BASE_URL = "https://esoicons.uesp.net/uespskills";
 	public static $DEST_BASE_URL = "https://en.uesp.net/wiki/Online:";
 	
+		/* Need to fix skill names with ' in them in order to get the correct wiki article name */
+	public static $SKILLNAME_FIXUP = array(
+			"mages-fury" => "Mages' Fury",
+			"mages-wrath" => "Mages' Wrath",
+			"vampires-bane" => "Vampire's Bane",
+			"mountains-blessing" => "Mountain's Blessing",
+			"assassins-blade" => "Assassin's Blade",
+			"killers-blade" => "Killer's Blade",
+			"hunters-eye" => "Hunter's Eye",
+			"reapers-mark" => "Reaper's Mark",
+			"hircines-bounty" => "Hircine's Bounty",
+			"hircines-rage" => "Hircine's Rage",
+			"hircines-fortitude" => "Hircine's Fortitude",
+			"yffres-endurance" => "Y'ffre's Endurance",
+			"lights-champion" => "Light's Champion",
+			"natures-grasp" => "Nature's Grasp",
+			"natures-embrace" => "Nature's Embrace",
+			"natures-gift" => "Nature's Gift",
+			"falcons-swiftness" => "Falcon's Swiftness",
+			"winters-revenge" => "Winter's Revenge",
+			"syrabanes-boon" => "Syrabane's Boon",
+			"summoners-armor" => "Summoner's Armor",
+			"scriers-patience" => "Scrier's Patience",
+			"excavators-reserves" => "Excavator's Reserves",
+			"rourkens-rebuke" => "Rourken's Rebuke",
+			"malacaths-vengeance" => "Malacath's Vengeance",
+			"pariahs-resolve" => "Pariah's Resolve"
+	);
+	
 	
 	public static function uespEsoDataEnqueueResources()
 	{
@@ -22,6 +53,36 @@ class CUespEsoWordPressPlugin
 		wp_enqueue_style( 'esoskillclient', 'https://esolog.uesp.net/resources/esoSkillClient.css' );
 		
 		wp_enqueue_script( 'esoskills', plugin_dir_url(__FILE__) . 'scripts/esoskills.js', array( 'jquery' ) );
+	}
+	
+	
+	public static function fixupSkillName($skillName)
+	{
+		$newSkillName = self::$SKILLNAME_FIXUP[$skillName];
+		if ($newSkillName != null) return $newSkillName;
+		return $skillName;
+	}
+	
+	
+	public static function getWikiArticleUrl($skillName)
+	{
+		$result = preg_match('#(.*)/(.*)/(.*)#', $skillName, $matches);
+		
+		if ($result)
+		{
+			$articleName = self::fixupSkillName($matches[3]);
+			$articleName = preg_replace('#-#', ' ', $articleName);
+			$articleName = ucwords($articleName);
+		}
+		else
+		{
+			$articleName = self::fixupSkillName($skillName);
+			$articleName = preg_replace('#-#', ' ', $articleName);
+			$articleName = ucwords($articleName);
+		}
+		
+		$destUrl = self::$DEST_BASE_URL . $articleName;
+		return $destUrl;
 	}
 	
 	
@@ -38,26 +99,23 @@ class CUespEsoWordPressPlugin
 			if ($id >= 1 && $id <= 6)
 			{
 				$skillName = strtolower($value);
+				$skillName = str_replace('https://eso-hub.com/en/skills/', '', $skillName);
+				$skillName = str_replace("'", '', $skillName);
 				$skillName = preg_replace('#[ :"<>&]#', '-', $skillName);
+				if ($skillName == 'n/a' || $skillName == '') continue;
+				
+				$isPassive = false;
+				if (strstr($skillName, "racial/")) $isPassive = true;
 				
 				$src = self::$ICON_BASE_URL . "/$version/$skillName.png";
 				
-				$result = preg_match('#(.*)/(.*)/(.*)#', $skillName, $matches);
+				$destUrl = self::getWikiArticleUrl($skillName);
 				
-				if ($result)
-				{
-					$articleName = preg_replace('#-#', ' ', $matches[3]);
-					$articleName = ucwords($articleName);
-				}
+				if ($isPassive)
+					$output .= "<div class='uespEsoSkillIconDiv uespEsoSkillIconDivPassive'>";
 				else
-				{
-					$articleName = preg_replace('#-#', ' ', $skillName);
-					$articleName = ucwords($articleName);
-				}
+					$output .= "<div class='uespEsoSkillIconDiv'>";
 				
-				$destUrl = self::$DEST_BASE_URL . $articleName;
-				
-				$output .= "<div class='uespEsoSkillIconDiv'>";
 				if (!$isMobile) $output .= "<a target=\"_blank\" href=\"$destUrl\">";
 				$output .= "<img src=\"$src\" skillname=\"$skillName\" ismobile=\"$isMobile\" class=\"uespEsoSkillIcon\" />";
 				if (!$isMobile) $output .= "</a>";
