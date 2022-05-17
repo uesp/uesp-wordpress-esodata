@@ -38,7 +38,7 @@ class CUespEsoWordPressPlugin
 			if ($id >= 1 && $id <= 6)
 			{
 				$skillName = strtolower($value);
-				$skillName = preg_replace('#[ :"<>]#', '-', $skillName);
+				$skillName = preg_replace('#[ :"<>&]#', '-', $skillName);
 				
 				$src = self::$ICON_BASE_URL . "/$version/$skillName.png";
 				
