@@ -49,10 +49,12 @@ class CUespEsoWordPressPlugin
 	
 	public static function uespEsoDataEnqueueResources()
 	{
-		wp_enqueue_style( 'esoskills', 'https://esolog.uesp.net/resources/esoskills_embed.css' );
-		wp_enqueue_style( 'esoskillclient', 'https://esolog.uesp.net/resources/esoSkillClient.css' );
+		wp_enqueue_style( 'uespesoskills', 'https://esolog.uesp.net/resources/esoskills_embed.css' );
+		wp_enqueue_style( 'uespesoskillclient', 'https://esolog.uesp.net/resources/esoSkillClient.css' );
+		wp_enqueue_style( 'uespesodata', plugin_dir_url(__FILE__) . 'css/esodata.css' );
 		
-		wp_enqueue_script( 'esoskills', plugin_dir_url(__FILE__) . 'scripts/esoskills.js', array( 'jquery' ) );
+		wp_enqueue_script( 'uespesoskills', plugin_dir_url(__FILE__) . 'scripts/esoskills.js', array( 'jquery' ) );
+		wp_enqueue_script( 'uespesodata', plugin_dir_url(__FILE__) . 'scripts/esodata.js', array( 'jquery' ) );
 	}
 	
 	
@@ -127,8 +129,19 @@ class CUespEsoWordPressPlugin
 		return $output;
 	}
 	
+	
+	public static function uespEsoDataServerStatusShortCode ( $attrs, $content, $tag )
+	{
+		$content = trim($content);
+		if ($content != "") $content = "<h1>$content</h1>";
+		
+		$output = "<div class='uespEsoServerStatus'>$content</div>";
+		return $output;
+	}
+	
 };
 
 add_action( 'wp_enqueue_scripts', 'CUespEsoWordPressPlugin::uespEsoDataEnqueueResources' );
 add_shortcode('uesp_esoskillbar', 'CUespEsoWordPressPlugin::uespEsoDataSkillShortCode');
+add_shortcode('uesp_esoserverstatus', 'CUespEsoWordPressPlugin::uespEsoDataServerStatusShortCode');
 
