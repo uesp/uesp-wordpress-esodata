@@ -43,14 +43,18 @@
 
 .uespEsoStatusUp {
 	display: inline-block;
-	color: green;
+	color: #339933;
 	font-weight: bold;
+	min-width: 50px;
+	text-align: left;
 }
 
 .uespEsoStatusDown {
 	display: inline-block;
-	color: #aa0000;
+	color: #ee3333;
 	font-weight: bold;
+	min-width: 50px;
+	text-align: left;
 }
 
 .uespEsoStatusUnknown {

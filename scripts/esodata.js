@@ -31,7 +31,6 @@ window.uespEsoDataIsGoldenVendorTime = function(date)
 	var hour = date.getUTCHours();
 	
 	if (dayOfWeek == 6 || dayOfWeek == 0) return true;
-	if (dayOfWeek == 5 && hour >= 0) return true;
 	if (dayOfWeek == 1 && hour < 12) return true;
 	
 	return false;

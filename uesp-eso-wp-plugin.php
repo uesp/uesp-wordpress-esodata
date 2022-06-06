@@ -139,9 +139,112 @@ class CUespEsoWordPressPlugin
 		return $output;
 	}
 	
+	
+	function StatusSectionText() 
+	{
+    	echo '<p>Manually set the status of Twitch Drops and Events.</p>';
+	}
+	
+	
+	function ShowTwitchDropsSetting() 
+	{
+	    $options = get_option( 'uespesodata_settings' );
+	    echo "<input id='uespesodata_settings_twitchdrops' name='uespesodata_settings[twitchdrops]' type='checkbox' value='1' " .  checked($options['twitchdrops'] == 1, true, false) . " />";
+	}
+	
+	
+	function ShowIngameEventsSetting() 
+	{
+	    $options = get_option( 'uespesodata_settings' );
+	    echo "<input id='uespesodata_settings_ingameevents' name='uespesodata_settings[ingameevents]' type='checkbox' value='1' " .  checked($options['ingameevents'] == 1, true, false) . " />";
+	}
+	
+	
+	function RegisterSettings() 
+	{
+		add_options_page("UESP ESO Data", "UESP ESO Data", "manage_options", "UespEsoDataOptionsMenu", 'CUespEsoWordPressPlugin::OptionsMenu');
+		
+	    register_setting( 'uespesodata_settings', 'uespesodata_settings');
+	    add_settings_section( 'status_settings', 'Status Settings', 'StatusSectionText', 'UespEsoDataOptionsMenu' );
+	
+    	add_settings_field( 'uespesodata_settings_twitchdrops', 'Twitch Drops', 'CUespEsoWordPressPlugin::ShowTwitchDropsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
+		add_settings_field( 'uespesodata_settings_ingameevents', 'Ingame Events', 'CUespEsoWordPressPlugin::ShowIngameEventsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
+	}
+	
+	
+	public static function OptionsMenu()
+	{
+		 ?>
+		<h2>UESP ESO Data Plugin Settings</h2>
+		<form action="options.php" method="post">
+			<?php 
+			settings_fields( 'uespesodata_settings' );
+			do_settings_sections( 'UespEsoDataOptionsMenu' ); ?>
+			<input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e( 'Save' ); ?>" />
+		</form>
+		<?php
+	}
+	
+	
+	public static function TwitchDropsStatusShortCode( $attrs, $content, $tag )
+	{
+		$showLink = $attrs['link'];
+		if ($showLink == null) $showLink = true;
+		
+		$options = get_option( 'uespesodata_settings' );
+		$twitchDrops = $options['twitchdrops'];
+		$output = "";
+		
+		if ($showLink) $output = '<a href="https://deltiasgaming.com/twitch-drops">';
+		
+		if ($twitchDrops == 1)
+		{
+			$output .= '<div class="uespEsoServer"><div class="uespEsoServerTitle">Twitch Drops:</div> <div class="uespEsoStatusUp">Active</div></div>';
+		}
+		else
+		{
+			$output .= '<div class="uespEsoServer"><div class="uespEsoServerTitle">Twitch Drops:</div> <div class="uespEsoStatusDown">None</div></div>';
+		}
+		
+		if ($showLink) $output .= '</a>';
+		return $output;
+	}
+	
+	
+	public static function IngameEventsStatusShortCode( $attrs, $content, $tag )
+	{
+		$showLink = $attrs['link'];
+		if ($showLink == null) $showLink = true;
+		
+		$options = get_option( 'uespesodata_settings' );
+		$twitchDrops = $options['ingameevents'];
+		$output = "";
+		
+		if ($showLink) $output = '<a href="https://deltiasgaming.com/in-game-events">';
+		
+		if ($twitchDrops == 1)
+		{
+			$output .= '<div class="uespEsoServer"><div class="uespEsoServerTitle">Ingame Events:</div> <div class="uespEsoStatusUp">Active</div></div>';
+		}
+		else
+		{
+			$output .= '<div class="uespEsoServer"><div class="uespEsoServerTitle">Ingame Events:</div> <div class="uespEsoStatusDown">None</div></div>';
+		}
+		
+		if ($showLink) $output .= '</a>';
+		return $output;
+	}
+	
 };
+
 
 add_action( 'wp_enqueue_scripts', 'CUespEsoWordPressPlugin::uespEsoDataEnqueueResources' );
 add_shortcode('uesp_esoskillbar', 'CUespEsoWordPressPlugin::uespEsoDataSkillShortCode');
 add_shortcode('uesp_esoserverstatus', 'CUespEsoWordPressPlugin::uespEsoDataServerStatusShortCode');
+add_shortcode('uesp_esotwitchdrops', 'CUespEsoWordPressPlugin::TwitchDropsStatusShortCode');
+add_shortcode('uesp_esoingameevents', 'CUespEsoWordPressPlugin::IngameEventsStatusShortCode');
+
+
+add_action( 'admin_menu', 'CUespEsoWordPressPlugin::RegisterSettings' );
+
 
