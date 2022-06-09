@@ -47,7 +47,7 @@ class CUespEsoWordPressPlugin
 	);
 	
 	
-	public static function uespEsoDataEnqueueResources()
+	public static function EnqueueResources()
 	{
 		wp_enqueue_style( 'uespesoskills', 'https://esolog.uesp.net/resources/esoskills_embed.css' );
 		wp_enqueue_style( 'uespesoskillclient', 'https://esolog.uesp.net/resources/esoSkillClient.css' );
@@ -88,7 +88,7 @@ class CUespEsoWordPressPlugin
 	}
 	
 	
-	public static function uespEsoDataSkillShortCode( $attrs, $content, $tag )
+	public static function SkillShortCode( $attrs, $content, $tag )
 	{
 		$isMobile = wp_is_mobile();
 		$output = "<div class=\"has-text-align-center\"><div class=\"uespEsoSkillBar\">";
@@ -130,7 +130,7 @@ class CUespEsoWordPressPlugin
 	}
 	
 	
-	public static function uespEsoDataServerStatusShortCode ( $attrs, $content, $tag )
+	public static function ServerStatusShortCode ( $attrs, $content, $tag )
 	{
 		$content = trim($content);
 		if ($content != "") $content = "<h1>$content</h1>";
@@ -235,16 +235,26 @@ class CUespEsoWordPressPlugin
 		return $output;
 	}
 	
+	
+	public static function EndeavorShortCode( $attrs, $content, $tag )
+	{
+		$showAll = intval($attrs['showall']);
+		
+		$output = file_get_contents("https://esolog.uesp.net/getEndeavorHtml.php?showall=$showAll");
+		
+		return $output;
+	}
+	
 };
 
 
-add_action( 'wp_enqueue_scripts', 'CUespEsoWordPressPlugin::uespEsoDataEnqueueResources' );
-add_shortcode('uesp_esoskillbar', 'CUespEsoWordPressPlugin::uespEsoDataSkillShortCode');
-add_shortcode('uesp_esoserverstatus', 'CUespEsoWordPressPlugin::uespEsoDataServerStatusShortCode');
+add_action( 'wp_enqueue_scripts', 'CUespEsoWordPressPlugin::EnqueueResources' );
+add_action( 'admin_menu', 'CUespEsoWordPressPlugin::RegisterSettings' );
+
+add_shortcode('uesp_esoskillbar', 'CUespEsoWordPressPlugin::SkillShortCode');
+add_shortcode('uesp_esoserverstatus', 'CUespEsoWordPressPlugin::ServerStatusShortCode');
 add_shortcode('uesp_esotwitchdrops', 'CUespEsoWordPressPlugin::TwitchDropsStatusShortCode');
 add_shortcode('uesp_esoingameevents', 'CUespEsoWordPressPlugin::IngameEventsStatusShortCode');
-
-
-add_action( 'admin_menu', 'CUespEsoWordPressPlugin::RegisterSettings' );
+add_shortcode('uesp_esoendeavors', 'CUespEsoWordPressPlugin::EndeavorShortCode');
 
 

@@ -75,3 +75,44 @@
 .uespEsoLeadSetName img {
     vertical-align: middle;
 }
+
+.uespesoGoldenItem {
+	font-weight: bold;
+	color: #fff;
+}
+.uespesoGoldenItemQuality0 {
+	color: #fff !important;
+}
+.uespesoGoldenItemQuality1 {
+	color: #fff !important;
+}
+.uespesoGoldenItemQuality2 {
+	color: #2DC50E !important;
+}
+.uespesoGoldenItemQuality3 {
+	color: #3A92FF !important;
+}
+.uespesoGoldenItemQuality4 {
+	color: #A02EF7 !important;
+}
+.uespesoGoldenItemQuality5 {
+	color: #EECA2A !important;
+}
+.eso_item_link_popup {
+	height: fit-content;
+	width: fit-content;
+	z-index: 250;
+}
+.uespesoEndeavorTypeTitle {
+	font-weight: bold;
+	font-size: 120%;
+}
+.uespesoEndeavorTypeTitle0 {
+	color: #ffc;
+}
+.uespesoEndeavorTypeTitle1 {
+	color: #ccf;
+}
+.uespesoEndeavorName {
+	font-weight: bold;
+}
