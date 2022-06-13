@@ -64,6 +64,7 @@
 }
 
 .uespEsoLeadsTable {
+	width: 100%;
 }
 
 .uespEsoLeadSetName {
@@ -71,9 +72,10 @@
 	color: #ffff99;
 	font-size: 130%;
 	background-color: #333;
+	width: 100%;
 }
 .uespEsoLeadSetName img {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 
 .uespesoGoldenItem {
@@ -108,11 +110,18 @@
 	font-size: 120%;
 }
 .uespesoEndeavorTypeTitle0 {
-	color: #ffc;
+	color: #ff9;
 }
 .uespesoEndeavorTypeTitle1 {
-	color: #ccf;
+	color: #99f;
 }
 .uespesoEndeavorName {
 	font-weight: bold;
+}
+.uespesoServerStatusPage .uespEsoServerStatus {
+	float: none;
+	font-size: 125%;
+}
+.uespesoServerStatusPage .uespEsoServerTitle {
+	width: 200px;
 }

@@ -135,32 +135,32 @@ class CUespEsoWordPressPlugin
 		$content = trim($content);
 		if ($content != "") $content = "<h1>$content</h1>";
 		
-		$output = "<div class='uespEsoServerStatus'>$content</div>";
+		$output = "<div class='uespEsoServerStatusRoot'>$content</div>";
 		return $output;
 	}
 	
 	
-	function StatusSectionText() 
+	function StatusSectionText()
 	{
     	echo '<p>Manually set the status of Twitch Drops and Events.</p>';
 	}
 	
 	
-	function ShowTwitchDropsSetting() 
+	function ShowTwitchDropsSetting()
 	{
 	    $options = get_option( 'uespesodata_settings' );
 	    echo "<input id='uespesodata_settings_twitchdrops' name='uespesodata_settings[twitchdrops]' type='checkbox' value='1' " .  checked($options['twitchdrops'] == 1, true, false) . " />";
 	}
 	
 	
-	function ShowIngameEventsSetting() 
+	function ShowIngameEventsSetting()
 	{
 	    $options = get_option( 'uespesodata_settings' );
 	    echo "<input id='uespesodata_settings_ingameevents' name='uespesodata_settings[ingameevents]' type='checkbox' value='1' " .  checked($options['ingameevents'] == 1, true, false) . " />";
 	}
 	
 	
-	function RegisterSettings() 
+	function RegisterSettings()
 	{
 		add_options_page("UESP ESO Data", "UESP ESO Data", "manage_options", "UespEsoDataOptionsMenu", 'CUespEsoWordPressPlugin::OptionsMenu');
 		
@@ -245,6 +245,16 @@ class CUespEsoWordPressPlugin
 		return $output;
 	}
 	
+	
+	public static function GoldenVendorShortCode( $attrs, $content, $tag )
+	{
+		$showAll = intval($attrs['showall']);
+		
+		$output = file_get_contents("https://esolog.uesp.net/getGoldenVendorHtml.php?showall=$showAll");
+		
+		return $output;
+	}
+	
 };
 
 
@@ -256,5 +266,6 @@ add_shortcode('uesp_esoserverstatus', 'CUespEsoWordPressPlugin::ServerStatusShor
 add_shortcode('uesp_esotwitchdrops', 'CUespEsoWordPressPlugin::TwitchDropsStatusShortCode');
 add_shortcode('uesp_esoingameevents', 'CUespEsoWordPressPlugin::IngameEventsStatusShortCode');
 add_shortcode('uesp_esoendeavors', 'CUespEsoWordPressPlugin::EndeavorShortCode');
+add_shortcode('uesp_esogoldenvendor', 'CUespEsoWordPressPlugin::GoldenVendorShortCode');
 
 

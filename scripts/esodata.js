@@ -1,6 +1,6 @@
 window.uespEsoDataOnDocumentLoaded = function()
 {
-	var serverStatusDivs = jQuery(".uespEsoServerStatus");
+	var serverStatusDivs = jQuery(".uespEsoServerStatusRoot");
 	
 	if (serverStatusDivs.length > 0)
 	{
@@ -21,7 +21,7 @@ window.uespEsoDataOnDocumentLoaded = function()
 
 window.uespEsoDataOnReceiveServerStatus = function (data)
 {
-	var serverStatusDivs = jQuery(".uespEsoServerStatus");
+	var serverStatusDivs = jQuery(".uespEsoServerStatusRoot");
 	
 	//console.log("uespEsoDataOnReceiveServerStatus", data);
 	serverStatusDivs.html(serverStatusDivs.html() + data);
@@ -42,7 +42,7 @@ window.uespEsoDataIsGoldenVendorTime = function(date)
 
 window.uespEsoDataUpdateServerStatus = function(forceUpdate)
 {
-	var status = jQuery("#uespEsoServerStatus");
+	var status = jQuery(".uespEsoServerStatusRoot");
 	
 	if (status.length == 0) return;
 	
@@ -66,7 +66,7 @@ window.OnReceiveUespEsoServerStatus = function(data)
 
 window.uespEsoDataUpdateGoldenVendor = function(forceUpdate)
 {
-	var element = jQuery("#uespEsoGoldenVendorStatus");
+	var element = jQuery(".uespEsoGoldenVendorStatus");
 	var oldStatus = element.hasClass("uespEsoStatusUp");
 	var today = new Date();
 	var newStatus = uespEsoDataIsGoldenVendorTime(today);
