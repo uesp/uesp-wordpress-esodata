@@ -95,6 +95,7 @@ class CUespEsoWordPressPlugin
 		
 		$version = $attrs['version'];
 		if ($version == null || $version == '') $version = "current";
+		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
 		
 		foreach ($attrs as $id => $value)
 		{
@@ -119,7 +120,7 @@ class CUespEsoWordPressPlugin
 					$output .= "<div class='uespEsoSkillIconDiv'>";
 				
 				if (!$isMobile) $output .= "<a target=\"_blank\" href=\"$destUrl\">";
-				$output .= "<img src=\"$src\" skillname=\"$skillName\" ismobile=\"$isMobile\" class=\"uespEsoSkillIcon\" />";
+				$output .= "<img src=\"$src\" skillname=\"$skillName\" ismobile=\"$isMobile\" version=\"$version\" class=\"uespEsoSkillIcon\" />";
 				if (!$isMobile) $output .= "</a>";
 				$output .= "</div>";
 			}

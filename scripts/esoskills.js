@@ -107,15 +107,18 @@ function OnEsoDataSkillClientHover(e)
 	var skillid = element.attr("skillid");
 	var skillName = element.attr("skillname");
 	var isMobile = element.attr("isMobile");
+	var version = element.attr("version"); 
 	
 	if ((skillid == null || skillid == "") && (skillName == null || skillName == "")) 
 	{
 		return;
 	}
 	
+	if (version == null || version == "current") version = "";
+	
 	jQuery.ajax({
 		url: '//esolog.uesp.net/skillTooltip.php',
-		data:  { 'id' : skillid, 'name' : skillName, 'includelink' : isMobile },
+		data:  { 'id' : skillid, 'name' : skillName, 'includelink' : isMobile, 'version' : version },
 		type: 'get',
 		context: element,
 		dataType: 'html',
