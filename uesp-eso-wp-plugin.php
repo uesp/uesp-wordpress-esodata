@@ -66,7 +66,7 @@ class CUespEsoWordPressPlugin
 	}
 	
 	
-	public static function getWikiArticleUrl($skillName)
+	public static function getSkillWikiArticleUrl($skillName)
 	{
 		$result = preg_match('#(.*)/(.*)/(.*)#', $skillName, $matches);
 		
@@ -112,7 +112,7 @@ class CUespEsoWordPressPlugin
 				
 				$src = self::$ICON_BASE_URL . "/$version/$skillName.png";
 				
-				$destUrl = self::getWikiArticleUrl($skillName);
+				$destUrl = self::getSkillWikiArticleUrl($skillName);
 				
 				if ($isPassive)
 					$output .= "<div class='uespEsoSkillIconDiv uespEsoSkillIconDivPassive'>";
@@ -131,6 +131,37 @@ class CUespEsoWordPressPlugin
 	}
 	
 	
+	public static function SetShortCode( $attrs, $content, $tag )
+	{
+		$isMobile = wp_is_mobile();
+		$output = "";
+		
+		$version = $attrs['version'];
+		if ($version == null || $version == '') $version = "";
+		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
+		
+		$seperator = $attrs['sep'];
+		if ($seperator == null) $seperator = " ";
+		$seperator = esc_html($seperator);
+		
+		foreach ($attrs as $id => $value)
+		{
+			$id = intval($id);
+			if ($id <= 0) continue;
+			
+			$setName = $value;
+			
+			$safeName = esc_attr($setName);
+			$link = "https://en.uesp.net/wiki/Online:$safeName";
+			$title = esc_html($setName);
+			
+			$output .= "<a href=\"$link\" version=\"$version\" ismobile=\"$isMobile\" class=\"uespEsoSetLink\" setname=\"$safeName\">$title</a>$seperator";
+		}
+		
+		return $output;
+	}
+	
+	
 	public static function ServerStatusShortCode ( $attrs, $content, $tag )
 	{
 		$content = trim($content);
@@ -143,21 +174,21 @@ class CUespEsoWordPressPlugin
 	
 	function StatusSectionText()
 	{
-    	echo '<p>Manually set the status of Twitch Drops and Events.</p>';
+		echo '<p>Manually set the status of Twitch Drops and Events.</p>';
 	}
 	
 	
 	function ShowTwitchDropsSetting()
 	{
-	    $options = get_option( 'uespesodata_settings' );
-	    echo "<input id='uespesodata_settings_twitchdrops' name='uespesodata_settings[twitchdrops]' type='checkbox' value='1' " .  checked($options['twitchdrops'] == 1, true, false) . " />";
+		$options = get_option( 'uespesodata_settings' );
+		echo "<input id='uespesodata_settings_twitchdrops' name='uespesodata_settings[twitchdrops]' type='checkbox' value='1' " .  checked($options['twitchdrops'] == 1, true, false) . " />";
 	}
 	
 	
 	function ShowIngameEventsSetting()
 	{
-	    $options = get_option( 'uespesodata_settings' );
-	    echo "<input id='uespesodata_settings_ingameevents' name='uespesodata_settings[ingameevents]' type='checkbox' value='1' " .  checked($options['ingameevents'] == 1, true, false) . " />";
+		$options = get_option( 'uespesodata_settings' );
+		echo "<input id='uespesodata_settings_ingameevents' name='uespesodata_settings[ingameevents]' type='checkbox' value='1' " .  checked($options['ingameevents'] == 1, true, false) . " />";
 	}
 	
 	
@@ -165,10 +196,10 @@ class CUespEsoWordPressPlugin
 	{
 		add_options_page("UESP ESO Data", "UESP ESO Data", "manage_options", "UespEsoDataOptionsMenu", 'CUespEsoWordPressPlugin::OptionsMenu');
 		
-	    register_setting( 'uespesodata_settings', 'uespesodata_settings');
-	    add_settings_section( 'status_settings', 'Status Settings', 'StatusSectionText', 'UespEsoDataOptionsMenu' );
+		register_setting( 'uespesodata_settings', 'uespesodata_settings');
+		add_settings_section( 'status_settings', 'Status Settings', 'StatusSectionText', 'UespEsoDataOptionsMenu' );
 	
-    	add_settings_field( 'uespesodata_settings_twitchdrops', 'Twitch Drops', 'CUespEsoWordPressPlugin::ShowTwitchDropsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
+		add_settings_field( 'uespesodata_settings_twitchdrops', 'Twitch Drops', 'CUespEsoWordPressPlugin::ShowTwitchDropsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
 		add_settings_field( 'uespesodata_settings_ingameevents', 'Ingame Events', 'CUespEsoWordPressPlugin::ShowIngameEventsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
 	}
 	
@@ -268,5 +299,7 @@ add_shortcode('uesp_esotwitchdrops', 'CUespEsoWordPressPlugin::TwitchDropsStatus
 add_shortcode('uesp_esoingameevents', 'CUespEsoWordPressPlugin::IngameEventsStatusShortCode');
 add_shortcode('uesp_esoendeavors', 'CUespEsoWordPressPlugin::EndeavorShortCode');
 add_shortcode('uesp_esogoldenvendor', 'CUespEsoWordPressPlugin::GoldenVendorShortCode');
+add_shortcode('uesp_esoset', 'CUespEsoWordPressPlugin::SetShortCode');
+
 
 

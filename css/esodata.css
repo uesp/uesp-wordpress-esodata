@@ -125,3 +125,13 @@
 .uespesoServerStatusPage .uespEsoServerTitle {
 	width: 200px;
 }
+
+#esovsPopupSetTooltip {
+	width: 400px;
+	line-height: 125%;
+	text-align: left;
+	white-space: normal;
+	font-family: "EsoFontStyleAlt", "Arial", sans-serif;
+	position: absolute;
+	z-index: 50;
+}
