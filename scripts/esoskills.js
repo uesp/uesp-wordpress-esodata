@@ -353,7 +353,6 @@ function EsoDataFixSetNameArticle(setName)
 }
 
 
-
 function EsoDataUpdateEsoHubSetLink(link)
 {
 	var $link = jQuery(link);
@@ -396,6 +395,51 @@ function EsoDataUpdateAllEsoHubSetLinks()
 		if (this.href.startsWith('https://eso-hub.com/en/sets/') || this.href.startsWith('https://www.eso-hub.com/en/sets/'))
 		{
 			EsoDataUpdateEsoHubSetLink(this);
+		}
+	});
+}
+
+
+
+function EsoDataUpdateUespSetLink(link)
+{
+	var $link = jQuery(link);
+	var matches = link.href.match(/https:\/\/en.uesp.net\/wiki\/Online:(.*)\?set/)
+	
+	if (!matches) return;
+	
+	var setName = matches[1];
+	if (setName == null || setName == "") return;
+	
+	setName = setName.replace('_', ' ');
+	setName = setName.replace(/ \(set\)$/, '');
+	
+	var articleName = EsoDataFixSetNameArticle(setName);
+	
+		// TODO: Replace with proper check?
+	var isMobile = ("ontouchstart" in document.documentElement);
+	
+	var safeName = setName.replace(/"/g, "&quot;");
+	var safeArticle = articleName.replace(/"/g, "&quot;");
+	
+		// <a href=\"$link\" version=\"$version\" ismobile=\"$isMobile\" class=\"uespEsoSetLink\" setname=\"$safeName\">$title</a>
+	$link.addClass("uespEsoSetLink");
+	$link.attr("version", "");
+	$link.attr("ismobile", isMobile ? "1" : "0");
+	$link.attr("setname", safeName);
+}
+
+
+function EsoDataUpdateAllUespSetLinks()
+{
+	var links = jQuery("a");
+	
+	links.each(function() {
+		
+			// https://en.uesp.net/wiki/Online:Adept_Rider?set
+		if (this.href.match(/https:\/\/en.uesp.net\/wiki\/Online:.*\?set/))
+		{
+			EsoDataUpdateUespSetLink(this);
 		}
 	});
 }
@@ -464,6 +508,7 @@ function EsoDataSkillClientOnReady()
 			return false; });
 	} */
 	
+	EsoDataUpdateAllUespSetLinks();
 	EsoDataUpdateAllEsoHubSetLinks();
 	EsoDataUpdateAllBuildTableSets();
 	
