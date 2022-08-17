@@ -46,6 +46,56 @@ class CUespEsoWordPressPlugin
 			"pariahs-resolve" => "Pariah's Resolve"
 	);
 	
+	public static $SETNAME_FIXUP = [
+			"Agility" => "Agility (set)",
+			"Alessian Order" => "Alessian Order (set)",
+			"Balorgh" => "Balorgh (set)",
+			"Baron Thirsk" => "Baron Thirsk (set)",
+			"Baron Zaudrus" => "Baron Zaudrus (set)",
+			"Bloodspawn" => "Bloodspawn (set)",
+ 			"Chokethorn" => "Chokethorn (set)",
+			"Giant Spider" => "Giant Spider (set)",
+			"Glorgoloch the Destroyer" => "Glorgoloch the Destroyer (set)",
+			"Grave Guardian" => "Grave Guardian (set)",
+			"Grothdarr" => "Grothdarr (set)",
+			"Grundwulf" => "Grundwulf (set)",
+			"Iceheart" => "Iceheart (set)",
+			"Immolator Charr" => "Immolator Charr (set)",
+			"Infernal Guardian" => "Infernal Guardian (set)",
+			"Kargaeda" => "Kargaeda (set)",
+			"Lady Malygda" => "Lady Malygda (set)",
+			"Lady Thorn" => "Lady Thorn (set)",
+			"Maarselok" => "Maarselok (set)",
+			"Magma Incarnate" => "Magma Incarnate (set)",
+			"Maw of the Infernal" => "Maw of the Infernal (set)",
+			"Might Chudan" => "Might Chudan (set)",
+			"Molag Kena" => "Molag Kena (set)",
+			"Mother Ciannait" => "Mother Ciannait (set)",
+			"Nazaray" => "Nazaray (set)",
+			"Nerien'eth" => "Nerien'eth (set)",
+			"Night Terror" => "Night Terror (set)",
+			"Nunatak" => "Nunatak (set)",
+			"Selene" => "Selene (set)",
+			"Sentinel of Rkugamz" => "Sentinel of Rkugamz (set)",
+			"Sentry" => "Sentry (set)",
+			"Shadow Walker" => "Shadow Walker (set)",
+			"Shadowrend" => "Shadowrend (set)",
+			"Slimecraw" => "Slimecraw (set)",
+			"Spawn of Mephala" => "Spawn of Mephala (set)",
+			"Stone Husk" => "Stone Husk (set)",
+			"Stormfist" => "Stormfist (set)",
+			"Swarm Mother" => "Swarm Mother (set)",
+			"Symphony of Blades" => "Symphony of Blades (set)",
+			"Thurvokun" => "Thurvokun (set)",
+			"Tremorscale" => "Tremorscale (set)",
+			"The Troll King" => "The Troll King (set)",
+			"Valkyn Skoria" => "Valkyn Skoria (set)",
+			"Vampire Lord" => "Vampire Lord (set)",
+			"Velidreth" => "Velidreth (set)",
+			"Winterborn" => "Winterborn (set)",
+			"Zoal the Ever-Wakeful" => "Zoal the Ever-Wakeful (set)",
+	];
+	
 	
 	public static function EnqueueResources()
 	{
@@ -63,6 +113,14 @@ class CUespEsoWordPressPlugin
 		$newSkillName = self::$SKILLNAME_FIXUP[$skillName];
 		if ($newSkillName != null) return $newSkillName;
 		return $skillName;
+	}
+	
+	
+	public static function fixupSetName($setName)
+	{
+		$newSetName = self::$SETNAME_FIXUP[$setName];
+		if ($newSetName != null) return $newSetName;
+		return $setName;
 	}
 	
 	
@@ -150,9 +208,12 @@ class CUespEsoWordPressPlugin
 			if ($id <= 0) continue;
 			
 			$setName = $value;
+			$articleName = self::fixupSetName($value);
 			
 			$safeName = esc_attr($setName);
-			$link = "https://en.uesp.net/wiki/Online:$safeName";
+			$safeArticle = esc_attr($articleName);
+			
+			$link = "https://en.uesp.net/wiki/Online:$safeArticle";
 			$title = esc_html($setName);
 			
 			$output .= "<a href=\"$link\" version=\"$version\" ismobile=\"$isMobile\" class=\"uespEsoSetLink\" setname=\"$safeName\">$title</a>$seperator";
