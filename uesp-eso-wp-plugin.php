@@ -155,9 +155,10 @@ class CUespEsoWordPressPlugin
 		if ($version == null || $version == '') $version = "current";
 		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
 		
+		$count = 1;
 		foreach ($attrs as $id => $value)
 		{
-			if ($id >= 1 && $id <= 6)
+			if ($count <= 6)
 			{
 				$skillName = strtolower($value);
 				$skillName = str_replace('https://eso-hub.com/en/skills/', '', $skillName);
@@ -167,6 +168,7 @@ class CUespEsoWordPressPlugin
 				
 				$isPassive = false;
 				if (strstr($skillName, "racial/")) $isPassive = true;
+				if (strstr($id, "passive")) $isPassive = true;
 				
 				$src = self::$ICON_BASE_URL . "/$version/$skillName.png";
 				
@@ -181,6 +183,7 @@ class CUespEsoWordPressPlugin
 				$output .= "<img src=\"$src\" skillname=\"$skillName\" ismobile=\"$isMobile\" version=\"$version\" class=\"uespEsoSkillIcon\" />";
 				if (!$isMobile) $output .= "</a>";
 				$output .= "</div>";
+				$count++;
 			}
 		}
 		
