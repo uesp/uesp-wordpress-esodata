@@ -233,32 +233,32 @@ class CUespEsoWordPressPlugin
 	}
 	
 	
-	function StatusSectionText()
+	public static function StatusSectionText()
 	{
 		echo '<p>Manually set the status of Twitch Drops and Events.</p>';
 	}
 	
 	
-	function ShowTwitchDropsSetting()
+	public static function ShowTwitchDropsSetting()
 	{
 		$options = get_option( 'uespesodata_settings' );
 		echo "<input id='uespesodata_settings_twitchdrops' name='uespesodata_settings[twitchdrops]' type='checkbox' value='1' " .  checked($options['twitchdrops'] == 1, true, false) . " />";
 	}
 	
 	
-	function ShowIngameEventsSetting()
+	public static function ShowIngameEventsSetting()
 	{
 		$options = get_option( 'uespesodata_settings' );
 		echo "<input id='uespesodata_settings_ingameevents' name='uespesodata_settings[ingameevents]' type='checkbox' value='1' " .  checked($options['ingameevents'] == 1, true, false) . " />";
 	}
 	
 	
-	function RegisterSettings()
+	public static function RegisterSettings()
 	{
 		add_options_page("UESP ESO Data", "UESP ESO Data", "manage_options", "UespEsoDataOptionsMenu", 'CUespEsoWordPressPlugin::OptionsMenu');
 		
 		register_setting( 'uespesodata_settings', 'uespesodata_settings');
-		add_settings_section( 'status_settings', 'Status Settings', 'StatusSectionText', 'UespEsoDataOptionsMenu' );
+		add_settings_section( 'status_settings', 'Status Settings', 'CUespEsoWordPressPlugin::StatusSectionText', 'UespEsoDataOptionsMenu' );
 	
 		add_settings_field( 'uespesodata_settings_twitchdrops', 'Twitch Drops', 'CUespEsoWordPressPlugin::ShowTwitchDropsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );
 		add_settings_field( 'uespesodata_settings_ingameevents', 'Ingame Events', 'CUespEsoWordPressPlugin::ShowIngameEventsSetting', 'UespEsoDataOptionsMenu', 'status_settings' );

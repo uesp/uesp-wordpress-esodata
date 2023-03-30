@@ -429,7 +429,8 @@ function EsoDataUpdateUespSetLink(link)
 	$link.attr("setname", safeName);
 }
 
-
+//TODO: Do the same for skills
+//https://eso-hub.com/en/skills/sorcerer/storm-calling/mages-fury
 function EsoDataUpdateAllUespSetLinks()
 {
 	var links = jQuery("a");
