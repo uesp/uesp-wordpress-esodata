@@ -1,10 +1,11 @@
 
 	/* Set to false to use the default Eso-Hub set tooltips */
 window.EsoOverrideEsoHubSets = true;
+window.EsoOverrideEsoHubCPs = true;
 
 window.EsoShouldShowSkillToolip = false;
 window.EsoShouldShowSetToolip = false;
-
+window.EsoShouldShowCPToolip = false;
 
 window.ESO_SETNAME_FIXUP = 
 	{
@@ -115,6 +116,29 @@ window.ESO_SETNAME_ARTICLE_FIXUP =
 		"Winterborn" : "Winterborn (set)",
 		"Zoal the Ever-Wakeful" : "Zoal the Ever-Wakeful (set)",
 	};
+
+
+window.EsoShowPopupCPTooltip = function(cpHtml, parent)
+{
+	var popupElement = jQuery("#esovsPopupCPTooltip");
+	
+	if (popupElement.length == 0)
+	{
+		jQuery("body").append('<div id="esovsPopupCPTooltip"></div>');
+		popupElement = jQuery("#esovsPopupCPTooltip");
+	}
+	
+	if (cpHtml == null)
+	{
+		popupElement.hide();
+		return;
+	}
+	
+	popupElement.html(cpHtml);
+	popupElement.show();
+	
+	AdjustEsoPopupTooltipPosition(popupElement, jQuery(parent));
+}
 
 
 window.EsoShowPopupSkillTooltip = function(skillHtml, parent)
@@ -246,10 +270,46 @@ function OnEsoDataSkillClientHover(e)
 }
 
 
+function OnEsoDataCPClientHover(e)
+{
+	EsoShouldShowCPToolip = true;
+	
+	var element = jQuery(this);
+	var cpName = element.text();
+	var isMobile = element.attr("isMobile");
+	var version = element.attr("version"); 
+	
+	if (cpName == null || cpName == "")
+	{
+		return;
+	}
+	
+	if (version == null || version == "current") version = "";
+	
+	jQuery.ajax({
+		url: '//esolog.uesp.net/cpTooltip.php',
+		data:  { 'name' : cpName, 'includelink' : isMobile, 'version' : version },
+		type: 'get',
+		context: element,
+		dataType: 'html',
+		cache: false,
+		success: OnReceiveEsoDataCPClientData,
+		async:true,
+	});
+}
+
+
 function OnReceiveEsoDataSkillClientData(skillData)
 {
 	if (!EsoShouldShowSkillToolip) return;
 	EsoShowPopupSkillTooltip(skillData, jQuery(this));
+}
+
+
+function OnReceiveEsoDataCPClientData(cpData)
+{
+	if (!EsoShouldShowCPToolip) return;
+	EsoShowPopupCPTooltip(cpData, jQuery(this));
 }
 
 
@@ -258,6 +318,14 @@ function OnEsoDataSkillClientLeave(e)
 	var popupElement = jQuery("#esovsPopupSkillTooltip");
 	popupElement.hide();
 	EsoShouldShowSkillToolip = false;
+}
+
+
+function OnEsoDataCPClientLeave(e)
+{
+	var popupElement = jQuery("#esovsPopupCPTooltip");
+	popupElement.hide();
+	EsoShouldShowCPToolip = false;
 }
 
 
@@ -497,6 +565,51 @@ function EsoDataUpdateAllBuildTableSets()
 }
 
 
+function EsoDataUpdateAllEsoHubCPLinks()
+{
+	if (!EsoOverrideEsoHubCPs) return;
+	
+	var links = jQuery("a");
+	
+	links.each(function() {
+		
+			//<a href="https://eso-hub.com/en/champion-points/star/precision">Precision</a>
+		if (this.href.startsWith('https://eso-hub.com/en/champion-points/') || this.href.startsWith('https://www.eso-hub.com/en/champion-points/'))
+		{
+			EsoDataUpdateEsoHubCPLink(this);
+		}
+	});
+}
+
+
+function EsoDataUpdateEsoHubCPLink(link)
+{
+	var $link = jQuery(link);
+	var cpName = $link.text();
+	var oldLink = $link.attr("href");
+	
+	var articleName = cpName;
+	
+		// TODO: Replace with proper check?
+	var isMobile = ("ontouchstart" in document.documentElement);
+	
+	var safeName = cpName.replace(/"/g, "&quot;");
+	var safeArticle = articleName.replace(/"/g, "&quot;");
+	var newLink = "https://en.uesp.net/wiki/Online:" + safeArticle;
+	
+	$link.addClass("uespEsoCPLink");
+	$link.attr("version", "");
+	$link.attr("ismobile", isMobile ? "1" : "0");
+	$link.attr("cpname", safeName);
+	$link.attr("href", newLink);
+	$link.attr("oldlink", oldLink);
+	
+	var $newLink = $link.clone(false);
+	
+	$link.replaceWith($newLink);
+}
+
+
 function EsoDataSkillClientOnReady()
 {
 	
@@ -510,10 +623,12 @@ function EsoDataSkillClientOnReady()
 	} */
 	
 	EsoDataUpdateAllUespSetLinks();
+	EsoDataUpdateAllEsoHubCPLinks();
 	EsoDataUpdateAllEsoHubSetLinks();
 	EsoDataUpdateAllBuildTableSets();
 	
 	jQuery(".eso_skill_tooltip").hover(OnEsoDataSkillClientHover, OnEsoDataSkillClientLeave);
+	jQuery(".uespEsoCPLink").hover(OnEsoDataCPClientHover, OnEsoDataCPClientLeave);
 	jQuery(".uespEsoSkillIconDiv").hover(OnEsoDataSkillClientHover, OnEsoDataSkillClientLeave);
 	
 	jQuery(".uespEsoSetLink").hover(OnEsoDataSetClientHover, OnEsoDataSetClientLeave);
