@@ -102,7 +102,7 @@ class CUespEsoWordPressPlugin
 		wp_enqueue_style( 'uespesoskills', 'https://esolog.uesp.net/resources/esoskills_embed.css' );
 		wp_enqueue_style( 'uespesoskillclient', 'https://esolog.uesp.net/resources/esoSkillClient.css' );
 		wp_enqueue_style( 'uespesodata', plugin_dir_url(__FILE__) . 'css/esodata.css' );
-		wp_enqueue_style( 'uespesocps', 'https://esolog.uesp.net/resources/esocp_simple_embed.css' );
+        wp_enqueue_style( 'uespesocps', 'https://esolog.uesp.net/resources/esocp_simple_embed.css' );
 		
 		wp_enqueue_script( 'uespesoskills', plugin_dir_url(__FILE__) . 'scripts/esoskills.js', array( 'jquery' ) );
 		wp_enqueue_script( 'uespesodata', plugin_dir_url(__FILE__) . 'scripts/esodata.js', array( 'jquery' ) );
@@ -149,6 +149,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function SkillShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$isMobile = wp_is_mobile();
 		$output = "<div class=\"has-text-align-center\"><div class=\"uespEsoSkillBar\">";
 		
@@ -156,9 +159,10 @@ class CUespEsoWordPressPlugin
 		if ($version == null || $version == '') $version = "current";
 		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
 		
+		$count = 1;
 		foreach ($attrs as $id => $value)
 		{
-			if ($id >= 1 && $id <= 6)
+			if ($count <= 8)
 			{
 				$skillName = strtolower($value);
 				$skillName = str_replace('https://eso-hub.com/en/skills/', '', $skillName);
@@ -168,6 +172,7 @@ class CUespEsoWordPressPlugin
 				
 				$isPassive = false;
 				if (strstr($skillName, "racial/")) $isPassive = true;
+				if (strstr($id, "passive")) $isPassive = true;
 				
 				$src = self::$ICON_BASE_URL . "/$version/$skillName.png";
 				
@@ -182,6 +187,7 @@ class CUespEsoWordPressPlugin
 				$output .= "<img src=\"$src\" skillname=\"$skillName\" ismobile=\"$isMobile\" version=\"$version\" class=\"uespEsoSkillIcon\" />";
 				if (!$isMobile) $output .= "</a>";
 				$output .= "</div>";
+				$count++;
 			}
 		}
 		
@@ -192,6 +198,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function SetShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$isMobile = wp_is_mobile();
 		$output = "";
 		
@@ -226,6 +235,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function ServerStatusShortCode ( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$content = trim($content);
 		if ($content != "") $content = "<h1>$content</h1>";
 		
@@ -282,6 +294,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function TwitchDropsStatusShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$showLink = $attrs['link'];
 		if ($showLink == null) $showLink = true;
 		
@@ -307,6 +322,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function IngameEventsStatusShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$showLink = $attrs['link'];
 		if ($showLink == null) $showLink = true;
 		
@@ -332,6 +350,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function EndeavorShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$showAll = intval($attrs['showall']);
 		
 		$output = file_get_contents("https://esolog.uesp.net/getEndeavorHtml.php?showall=$showAll");
@@ -342,6 +363,9 @@ class CUespEsoWordPressPlugin
 	
 	public static function GoldenVendorShortCode( $attrs, $content, $tag )
 	{
+		if ($attrs === '') $attrs = [];
+		if (gettype($attrs) != "array") return "";
+		
 		$showAll = intval($attrs['showall']);
 		
 		$output = file_get_contents("https://esolog.uesp.net/getGoldenVendorHtml.php?showall=$showAll");
@@ -362,6 +386,3 @@ add_shortcode('uesp_esoingameevents', 'CUespEsoWordPressPlugin::IngameEventsStat
 add_shortcode('uesp_esoendeavors', 'CUespEsoWordPressPlugin::EndeavorShortCode');
 add_shortcode('uesp_esogoldenvendor', 'CUespEsoWordPressPlugin::GoldenVendorShortCode');
 add_shortcode('uesp_esoset', 'CUespEsoWordPressPlugin::SetShortCode');
-
-
-

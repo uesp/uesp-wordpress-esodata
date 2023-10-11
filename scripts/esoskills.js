@@ -444,6 +444,7 @@ function EsoDataUpdateEsoHubSetLink(link)
 	$link.attr("setname", safeName);
 	$link.attr("href", newLink);
 	$link.attr("oldlink", oldLink);
+	$link.attr("target", "_blank");
 	
 	var $newLink = $link.clone(false);
 	
@@ -540,6 +541,7 @@ function EsoDataUpdateBuildSetTable($table)
 		newLink.attr("ismobile", isMobile ? "1" : "0");
 		newLink.attr("setname", safeName);
 		newLink.attr("href", linkUrl);
+		newLink.attr("target", "_blank");
 		newLink.html(setCol.html());
 		
 		setCol.html(newLink);
@@ -603,6 +605,7 @@ function EsoDataUpdateEsoHubCPLink(link)
 	$link.attr("cpname", safeName);
 	$link.attr("href", newLink);
 	$link.attr("oldlink", oldLink);
+	$link.attr("target", "_blank");
 	
 	var $newLink = $link.clone(false);
 	
