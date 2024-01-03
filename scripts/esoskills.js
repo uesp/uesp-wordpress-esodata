@@ -258,6 +258,8 @@ function OnEsoSkillLinkClientHover(e)
 	
 	if (version == null || version == "current") version = "";
 	
+	skillName = skillName.replace('’', "'");
+	
 	jQuery.ajax({
 		url: '//esolog.uesp.net/skillTooltip.php',
 		data:  { 'id' : skillid, 'name' : skillName, 'includelink' : isMobile, 'version' : version },
@@ -290,6 +292,8 @@ function OnEsoDataSkillClientHover(e)
 	
 	if (version == null || version == "current") version = "";
 	
+	skillName = skillName.replace('’', "'");
+	
 	jQuery.ajax({
 		url: '//esolog.uesp.net/skillTooltip.php',
 		data:  { 'id' : skillid, 'name' : skillName, 'includelink' : isMobile, 'version' : version },
@@ -318,6 +322,8 @@ function OnEsoDataCPClientHover(e)
 	{
 		return;
 	}
+	
+	cpName = cpName.replace('’', "'");
 	
 	if (version == null || version == "current") version = "";
 	
@@ -417,6 +423,7 @@ function OnEsoDataSetClientHover(e)
 	
 	//safeName = encodeURIComponent(setName);
 	var safeName = setName.replace(/"/g, "&quot;");
+	safeName = safeName.replace('’', "'"); 
 	
 	EsoShowPopupSetTooltip("https://esolog.uesp.net/itemLinkImage.php?set=" + safeName + "&version=" + version + "", this);
 }
@@ -475,6 +482,8 @@ function OnEsoUespLinkClientLeave(e)
 
 function OnReceiveEsoUespLinkClientData(data)
 {
+	var element = jQuery(this);
+	
 	if (!EsoShouldShowLinkTooltip) return;
 	if (data.link == "") return;
 	
@@ -784,6 +793,10 @@ function EsoDataUpdateEsoHubCPLink(link)
 function EsoDataUpdateUespLink(link)
 {
 	var $link = jQuery(link);
+	
+	if ($link.hasClass("uespEsoCPLink")) return;
+	if ($link.hasClass("uespEsoSetLink")) return;
+	if ($link.hasClass("uespEsoSkillLink")) return;
 	
 		//TODO: Replace with proper check?
 	var isMobile = ("ontouchstart" in document.documentElement);
