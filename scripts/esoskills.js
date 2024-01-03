@@ -2,10 +2,13 @@
 	/* Set to false to use the default Eso-Hub set tooltips */
 window.EsoOverrideEsoHubSets = true;
 window.EsoOverrideEsoHubCPs = true;
+window.EsoOverrideEsoHubSkills = true;
+window.EsoOverrideUespLinks = true;
 
 window.EsoShouldShowSkillToolip = false;
 window.EsoShouldShowSetToolip = false;
 window.EsoShouldShowCPToolip = false;
+window.EsoShouldShowLinkTooltip = false;
 
 window.ESO_SETNAME_FIXUP = 
 	{
@@ -238,6 +241,38 @@ window.AdjustEsoPopupTooltipPosition = function (tooltip, parent)
 }
 
 
+function OnEsoSkillLinkClientHover(e)
+{
+	EsoShouldShowSkillToolip = true;
+	
+	var element = jQuery(this);
+	var skillid = element.attr("skillid");
+	var skillName = element.attr("skillname");
+	var isMobile = element.attr("isMobile");
+	var version = element.attr("version"); 
+	
+	if ((skillid == null || skillid == "") && (skillName == null || skillName == "")) 
+	{
+		return;
+	}
+	
+	if (version == null || version == "current") version = "";
+	
+	jQuery.ajax({
+		url: '//esolog.uesp.net/skillTooltip.php',
+		data:  { 'id' : skillid, 'name' : skillName, 'includelink' : isMobile, 'version' : version },
+		type: 'get',
+		context: element,
+		dataType: 'html',
+		cache: false,
+		success: OnReceiveEsoDataSkillClientData,
+		async:true,
+	});
+	
+	//EsoShowPopupSkillTooltip(skillData, jQuery(this)[0]);
+}
+
+
 function OnEsoDataSkillClientHover(e)
 {
 	EsoShouldShowSkillToolip = true;
@@ -395,6 +430,80 @@ function OnEsoDataSetClientLeave(e)
 }
 
 
+function OnEsoUespLinkClientHover(e)
+{
+	var element = jQuery(this);
+	var safeName = element.text();
+	var isMobile = element.attr("isMobile");
+	var version = element.attr("version");
+	
+	if (safeName == null || safeName == "") 
+	{
+		return;
+	}
+	
+	//EsoShouldShowSetToolip = true;
+	//EsoShouldShowSkillToolip = true;
+	EsoShouldShowLinkTooltip = true;
+	
+	safeName = safeName.replace(/"/g, "&quot;");
+	safeName = safeName.replace('’', "'"); 
+	
+	if (version == null || version == "current") version = "";
+	
+	jQuery.ajax({
+		url: '//esolog.uesp.net/esoNameTooltip.php',
+		data:  { 'name' : safeName },
+		type: 'get',
+		context: element,
+		dataType: 'json',
+		cache: false,
+		success: OnReceiveEsoUespLinkClientData,
+		async:true,
+	});
+}
+
+
+function OnEsoUespLinkClientLeave(e)
+{
+	EsoShouldShowLinkTooltip = false;
+	
+	OnEsoDataSetClientLeave();
+	OnEsoDataSkillClientLeave();
+}
+
+
+function OnReceiveEsoUespLinkClientData(data)
+{
+	if (!EsoShouldShowLinkTooltip) return;
+	if (data.link == "") return;
+	
+	if (data.type == "set")
+	{
+		EsoShouldShowSetToolip = true;
+		EsoShowPopupSetTooltip(data.link, this);
+	}
+	else if (data.type == "skill")
+	{
+		EsoShouldShowSkillToolip = true;
+		
+		jQuery.ajax({
+			url: data.link,
+			type: 'get',
+			context: element,
+			dataType: 'html',
+			cache: false,
+			success: OnReceiveEsoDataSkillClientData,
+			async: true,
+		});
+	}
+	else
+	{
+		//Unknown type?
+	}
+}
+
+
 function EsoDataFixSetName(setName)
 {
 	setName = setName.trim();
@@ -418,6 +527,50 @@ function EsoDataFixSetNameArticle(setName)
 	if (fixupName) setName = fixupName;
 	
 	return setName;
+}
+
+
+function toTitleCase(str)
+{
+	return str.replace(
+			/\w\S*/g,
+			function(txt) {
+				return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+			}
+		);
+}
+
+
+function EsoDataUpdateEsoHubSkillLink(link)
+{
+	var $link = jQuery(link);
+	var skillName = $link.text();
+	var oldLink = $link.attr("href");
+	
+		// TODO: Replace with proper check?
+	var isMobile = ("ontouchstart" in document.documentElement);
+	var articleName = skillName.replace(/^.*\//, '').replaceAll('-', ' ');
+	articleName = toTitleCase(articleName);
+	articleName = articleName.replaceAll(' Of ', ' of ');
+	articleName = articleName.replaceAll(' And ', ' and ');
+	articleName = articleName.replaceAll(' The ', ' the ');
+	
+	var safeName = skillName.replace(/"/g, "&quot;");
+	var safeArticle = articleName.replace(/"/g, "&quot;");
+	var newLink = "https://en.uesp.net/wiki/Online:" + safeArticle;
+	
+		// <a href=\"$link\" version=\"$version\" ismobile=\"$isMobile\" class=\"uespEsoSetLink\" setname=\"$safeName\">$title</a>
+	$link.addClass("uespEsoSkillLink");
+	$link.attr("version", "");
+	$link.attr("ismobile", isMobile ? "1" : "0");
+	$link.attr("skillname", safeName);
+	$link.attr("href", newLink);
+	$link.attr("oldlink", oldLink);
+	$link.attr("target", "_blank");
+	
+	var $newLink = $link.clone(false);
+	
+	$link.replaceWith($newLink);
 }
 
 
@@ -464,6 +617,21 @@ function EsoDataUpdateAllEsoHubSetLinks()
 		if (this.href.startsWith('https://eso-hub.com/en/sets/') || this.href.startsWith('https://www.eso-hub.com/en/sets/'))
 		{
 			EsoDataUpdateEsoHubSetLink(this);
+		}
+	});
+}
+
+
+function EsoDataUpdateAllEsoHubSkillLinks()
+{
+	if (!EsoOverrideEsoHubSkills) return;
+	
+	var links = jQuery("a");
+	
+	links.each(function() {
+		if (this.href.startsWith('https://eso-hub.com/en/skills/') || this.href.startsWith('https://www.eso-hub.com/en/skills/'))
+		{
+			EsoDataUpdateEsoHubSkillLink(this);
 		}
 	});
 }
@@ -613,6 +781,35 @@ function EsoDataUpdateEsoHubCPLink(link)
 }
 
 
+function EsoDataUpdateUespLink(link)
+{
+	var $link = jQuery(link);
+	
+		//TODO: Replace with proper check?
+	var isMobile = ("ontouchstart" in document.documentElement);
+	
+	$link.addClass("uespLinkTooltip");
+	$link.attr("ismobile", isMobile ? "1" : "0");
+	$link.attr("target", "_blank");
+}
+
+
+function EsoDataUpdateAllUespLinks()
+{
+	if (!EsoOverrideUespLinks) return;
+	
+	var links = jQuery("a");
+	
+	links.each(function() {
+		
+		if (this.href.startsWith('https://en.uesp.net/wiki/Online:') || this.href.startsWith('http://en.uesp.net/wiki/Online:'))
+		{
+			EsoDataUpdateUespLink(this);
+		}
+	});
+}
+
+
 function EsoDataSkillClientOnReady()
 {
 	
@@ -625,16 +822,22 @@ function EsoDataSkillClientOnReady()
 			return false; });
 	} */
 	
+	EsoDataUpdateAllUespLinks();	//Should be first
 	EsoDataUpdateAllUespSetLinks();
 	EsoDataUpdateAllEsoHubCPLinks();
 	EsoDataUpdateAllEsoHubSetLinks();
+	EsoDataUpdateAllEsoHubSkillLinks();
 	EsoDataUpdateAllBuildTableSets();
 	
 	jQuery(".eso_skill_tooltip").hover(OnEsoDataSkillClientHover, OnEsoDataSkillClientLeave);
-	jQuery(".uespEsoCPLink").hover(OnEsoDataCPClientHover, OnEsoDataCPClientLeave);
 	jQuery(".uespEsoSkillIconDiv").hover(OnEsoDataSkillClientHover, OnEsoDataSkillClientLeave);
+	jQuery(".uespEsoSkillLink").hover(OnEsoSkillLinkClientHover, OnEsoDataSkillClientLeave);
+	
+	jQuery(".uespEsoCPLink").hover(OnEsoDataCPClientHover, OnEsoDataCPClientLeave);
 	
 	jQuery(".uespEsoSetLink").hover(OnEsoDataSetClientHover, OnEsoDataSetClientLeave);
+	
+	jQuery(".uespLinkTooltip").hover(OnEsoUespLinkClientHover, OnEsoUespLinkClientLeave);
 }
 
 
