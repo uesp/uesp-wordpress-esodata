@@ -111,6 +111,7 @@ class CUespEsoWordPressPlugin
 	
 	public static function fixupSkillName($skillName)
 	{
+		if (!array_key_exists($skillName, self::$SKILLNAME_FIXUP)) return $skillName;
 		$newSkillName = self::$SKILLNAME_FIXUP[$skillName];
 		if ($newSkillName != null) return $newSkillName;
 		return $skillName;
@@ -119,6 +120,7 @@ class CUespEsoWordPressPlugin
 	
 	public static function fixupSetName($setName)
 	{
+		if (!array_key_exists($setName, self::$SETNAME_FIXUP)) return $setName;
 		$newSetName = self::$SETNAME_FIXUP[$setName];
 		if ($newSetName != null) return $newSetName;
 		return $setName;
@@ -155,7 +157,8 @@ class CUespEsoWordPressPlugin
 		$isMobile = wp_is_mobile();
 		$output = "<div class=\"has-text-align-center\"><div class=\"uespEsoSkillBar\">";
 		
-		$version = $attrs['version'];
+		$version = "current";
+		if (array_key_exists('version', $attrs)) $version = $attrs['version'];
 		if ($version == null || $version == '') $version = "current";
 		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
 		
@@ -204,7 +207,8 @@ class CUespEsoWordPressPlugin
 		$isMobile = wp_is_mobile();
 		$output = "";
 		
-		$version = $attrs['version'];
+		$version = "";
+		if (array_key_exists('version', $attrs)) $version = $attrs['version'];
 		if ($version == null || $version == '') $version = "";
 		$version = preg_replace('/[^0-9a-z_]/i', '', $version);
 		
